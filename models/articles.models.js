@@ -5,8 +5,8 @@ exports.selectArticleByArticleID = (article_id) => {
     SELECT * FROM articles 
     WHERE article_id = $1`,
     [article_id])
-    .then((data) => {
-        const { rows } = data;
+    .then((response) => {
+        const { rows } = response;
         if (rows.length === 0) {
             return Promise.reject({status: 404, msg: "Not Found"})
         }
@@ -25,10 +25,8 @@ exports.selectArticles = () => {
     ORDER BY created_at DESC
     `
     return db.query(sqlQuery)
-    .then((data) => {
-        const { rows } = data;
+    .then((response) => {
+        const { rows } = response;
         return rows;
     })
 }
-
-// the articles should be sorted by date in descending order.
