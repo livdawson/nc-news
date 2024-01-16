@@ -124,7 +124,7 @@ describe("/api/articles/:article_id/comments", () => {
           expect(typeof comment.created_at).toBe("string");
           expect(typeof comment.author).toBe("string");
           expect(typeof comment.body).toBe("string");
-          expect(typeof comment.article_id).toBe("number");
+          expect(comment.article_id).toBe(5);
         });
         expect(comments).toBeSortedBy("created_at", { descending: true });
       });
@@ -134,7 +134,7 @@ describe("/api/articles/:article_id/comments", () => {
       .get("/api/articles/100/comments")
       .expect(404)
       .then(({ body }) => {
-        expect(body.msg).toBe("Not Found");
+        expect(body.msg).toBe("article_id not found");
       });
   });
   test("GET: 400, should respond with appropriate message when given an invalid article_id", () => {
@@ -154,6 +154,50 @@ describe("/api/articles/:article_id/comments", () => {
         expect(comments).toEqual([]);
       });
   });
+  test('POST: 201, should provide client with the newly posted comment for the given article_id', () => {
+    return request(app)
+    .post("/api/articles/5/comments")
+    .send({ username: "butter_bridge", body: "Hello hello hello" })
+    .expect(201)
+    .then(({ body }) => {
+        const { comment } = body;
+        expect(comment).toMatchObject({
+        comment_id: expect.any(Number),
+        body: "Hello hello hello",
+        article_id: 5,
+        author: "butter_bridge",
+        votes: 0,
+        created_at: expect.any(String)
+        })
+    })
+  });
+  test('POST: 404, should respond with appropriate message when requesting to post a comment to a valid but non-existent article_id', () => {
+    return request(app)
+    .post("/api/articles/100/comments")
+    .send({ username: "butter_bridge", body: "Hello hello hello" })
+    .then(( { body }) => {
+        expect(body.msg).toBe("article_id not found");
+    })
+  });
+  test("POST: 400, should respond with appropriate message when requesting to post a comment to an invalid article_id", () => {
+    return request(app)
+      .post("/api/articles/one/comments")
+      .send({ username: "butter_bridge", body: "Hello hello hello" })
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad Request");
+      });
+  });
+  test("POST: 404, should respond with appropriate message when requesting to post a comment from a username not in users database", () => {
+    return request(app)
+      .post("/api/articles/5/comments")
+      .send({ username: "funky_hats", body: "Hello hello hello" })
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("username not found");
+      });
+  });
 });
+
 
 // REMEMBER TO ADD DESCRIPTION TO ENDPOINTS.JSON FILE !

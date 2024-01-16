@@ -15,13 +15,8 @@ exports.selectArticleByArticleID = (article_id) => {
 }
 
 exports.selectArticles = () => {
-    const commentCount = ` 
-    CAST(
-        (SELECT COUNT(*) FROM comments WHERE comments.article_id = articles.article_id) 
-    AS INTEGER)
-    `
     const sqlQuery = `
-    SELECT author, title, article_id, topic, created_at, votes, article_img_url, ${commentCount} AS comment_count FROM articles
+    SELECT author, title, article_id, topic, created_at, votes, article_img_url, CAST((SELECT COUNT(*) FROM comments WHERE comments.article_id = articles.article_id) AS INTEGER) AS comment_count FROM articles
     ORDER BY created_at DESC
     `
     return db.query(sqlQuery)
