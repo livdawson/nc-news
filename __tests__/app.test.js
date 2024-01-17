@@ -283,6 +283,29 @@ describe("/api/articles/:article_id/comments", () => {
   });
 });
 
+describe("/api/comments/:comment_id", () => {
+    test('DELETE: 204, responds with no content when the given comment_id is deleted from comments', () => {
+        return request(app)
+        .delete("/api/comments/1")
+        .expect(204)
+    });
+    test('DELETE: 404, responds with appropriate message when given a valid but non-existent comment_id', () => {
+        return request(app)
+        .delete("/api/comments/100")
+        .expect(404)
+        .then(({ body }) => {
+            expect(body.msg).toBe("comment_id not found")
+        })
+    });
+    test('DELETE: 400, responds with appropriate message when given a invalid comment_id', () => {
+        return request(app)
+        .delete("/api/comments/one")
+        .expect(400)
+        .then(({ body }) => {
+            expect(body.msg).toBe("Bad Request")
+        })
+    });
+});
 
 
 // REMEMBER TO ADD DESCRIPTION TO ENDPOINTS.JSON FILE

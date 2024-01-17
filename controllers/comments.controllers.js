@@ -1,8 +1,9 @@
 const {
   selectCommentsByArticleID,
   insertNewComment,
+  removeComment,
 } = require("../models/comments.models");
-const { checkArticleIDexists } = require("../utils/utils");
+const { checkArticleIDexists, checkCommentIDexists } = require("../utils/utils");
 
 exports.getCommentsByArticleID = (req, res, next) => {
   const { article_id } = req.params;
@@ -34,3 +35,16 @@ exports.postNewComment = (req, res, next) => {
       next(err);
     });
 };
+
+exports.deleteComment = (req, res, next) => {
+    const { comment_id } = req.params;
+    const deleteCommentQuery = removeComment(comment_id)
+    const commentIDExistenceQuery = checkCommentIDexists(comment_id)
+
+    Promise.all([deleteCommentQuery, commentIDExistenceQuery])
+    .then(() => {
+        res.status(204).send()
+    }).catch((err) => {
+        next(err)
+    })
+}
