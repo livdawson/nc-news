@@ -15,7 +15,7 @@ describe("/api/topics", () => {
       .then(({ body }) => {
         const { topics } = body;
         expect(topics).toBeInstanceOf(Array);
-        expect(topics.length).toBe(3);
+        expect(topics).toHaveLength(3);
         topics.forEach((topic) => {
           expect(typeof topic.slug).toBe("string");
           expect(typeof topic.description).toBe("string");
@@ -158,7 +158,7 @@ describe("/api/articles", () => {
       .then(({ body }) => {
         const { articles } = body;
         expect(articles).toBeInstanceOf(Array);
-        expect(articles.length).toBe(13);
+        expect(articles).toHaveLength(13);
         articles.forEach((article) => {
           expect(typeof article.author).toBe("string");
           expect(typeof article.title).toBe("string");
@@ -306,6 +306,25 @@ describe("/api/comments/:comment_id", () => {
         })
     });
 });
+
+describe('/api/users', () => {
+    test('GET: 200, should provide client with an array of all user objects', () => {
+        return request(app)
+        .get("/api/users")
+        .expect(200)
+        .then(({ body }) => {
+            const { users } = body;
+            expect(users).toBeInstanceOf(Array);
+            expect(users).toHaveLength(4);
+            users.forEach((user) => {
+                expect(typeof user.username).toBe('string');
+                expect(typeof user.name).toBe('string');
+                expect(typeof user.avatar_url).toBe('string')
+            })
+        })
+    });
+});
+
 
 
 // REMEMBER TO ADD DESCRIPTION TO ENDPOINTS.JSON FILE
