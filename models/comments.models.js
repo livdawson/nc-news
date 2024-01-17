@@ -13,6 +13,7 @@ exports.selectCommentsByArticleID = (article_id) => {
 }
 
 exports.insertNewComment = (article_id, username, body) => {
+    if (username === undefined || body === undefined) return Promise.reject ({ status: 400, msg: 'Bad Request'})
     return db.query(`SELECT username FROM users WHERE username = $1`, [username])
     .then((usernameRetrieved) => {
         const { rows } = usernameRetrieved;
