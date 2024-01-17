@@ -173,6 +173,35 @@ describe("/api/articles", () => {
         expect(articles).toBeSortedBy("created_at", { descending: true });
       });
   });
+  test('GET: 200, client can filter articles by the topic value specified in the query', () => {
+    return request(app)
+    .get('/api/articles?topic=cats')
+    .expect(200)
+    .then(({ body }) => {
+        const { articles } = body;
+        expect(articles).toHaveLength(1);
+        articles.forEach((article) => {
+            expect(article.topic).toBe('cats');
+        })
+    })
+  });
+  test('GET: 200, responds with an empty array if topic query in request has no articles associated to it', () => {
+    return request(app)
+    .get('/api/articles?topic=paper')
+    .expect(200)
+    .then(({ body }) => {
+        const { articles } = body;
+        expect(articles).toEqual([])
+    })
+  });
+  test('GET: 404, responds with appropriate message if a non-existent topic value is specified in the query', () => {
+    return request(app)
+    .get('/api/articles?topic=random')
+    .expect(404)
+    .then(({ body }) => {
+        expect(body.msg).toBe("topic not found")
+    })
+  });
 });
 
 describe("/api/articles/:article_id/comments", () => {
