@@ -211,6 +211,49 @@ describe("/api/articles", () => {
         expect(body.msg).toBe("topic not found")
     })
   });
+  test('GET: 200, client can sort articles by given sort_by query, only valid columns are accepted for sorting', () => {
+    return request(app)
+    .get("/api/articles?sort_by=article_id")
+    .expect(200)
+    .then(({ body }) => {
+      const { articles } = body;
+      expect(articles).toBeSortedBy("article_id", { descending: true })
+    })
+  });
+  test('GET: 400, should respond with appropriate message when invalid sort_by query is provided in client request', () => {
+    return request(app)
+    .get("/api/articles?sort_by=random")
+    .expect(400)
+    .then(({ body }) => {
+      expect(body.msg).toBe("Bad Request")
+    })
+  });
+  test('GET: 200, client can order articles by given order query', () => {
+    return request(app)
+    .get("/api/articles?order=asc")
+    .expect(200)
+    .then(({ body }) => {
+      const { articles } = body;
+      expect(articles).toBeSortedBy("created_at", { ascending: true })
+    })
+  });
+  test('GET: 400, should respond with appropriate message when invalid order query is provided in client request', () => {
+    return request(app)
+    .get("/api/articles?order=random")
+    .expect(400)
+    .then(({ body }) => {
+      expect(body.msg).toBe("Bad Request")
+    })
+  });
+  test('GET: 200, client can both sort and order articles by given query parameters all in one request', () => {
+    return request(app)
+    .get("/api/articles?sort_by=title&order=asc")
+    .expect(200)
+    .then(({ body }) => {
+      const { articles } = body;
+      expect(articles).toBeSortedBy("title", { ascending: true})
+    })
+  });
 });
 
 describe("/api/articles/:article_id/comments", () => {
@@ -303,8 +346,8 @@ describe("/api/articles/:article_id/comments", () => {
   });
   test("POST: 400, should respond with appropriate message when client request doesn't contain required information (missing a username property)", () => {
     return request(app)
-      .post("/api/articles/5/comments")
-      .send({ body: "Hello hello hello" })
+    .post("/api/articles/5/comments")
+    .send({ body: "Hello hello hello" })
       .expect(400)
       .then(({ body }) => {
         expect(body.msg).toBe("Bad Request");
@@ -362,5 +405,4 @@ describe('/api/users', () => {
         })
     });
 });
-
 

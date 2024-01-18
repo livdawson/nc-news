@@ -14,8 +14,15 @@ exports.selectArticleByArticleID = (article_id) => {
     })
 }
 
-exports.selectArticles = (topic) => {
+exports.selectArticles = (topic, sort_by = "created_at", order = "desc") => {
     const queryValues = [];
+    const validSortByQueries = ["created_at", "article_id", "title", "topic", "author", "body", "votes", "article_img_url"]
+    const validOrderQueries = ["asc", "desc"]
+
+    if (!validSortByQueries.includes(sort_by) || !validOrderQueries.includes(order)) {
+        return Promise.reject({status: 400, msg: "Bad Request"})
+    }
+
     let sqlQuery = `
     SELECT author, title, article_id, topic, created_at, votes, article_img_url, CAST((SELECT COUNT(*) FROM comments WHERE comments.article_id = articles.article_id) AS INTEGER) AS comment_count FROM articles 
     `
@@ -24,7 +31,7 @@ exports.selectArticles = (topic) => {
         queryValues.push(topic)
     }
 
-    sqlQuery += ` ORDER BY created_at DESC `
+    sqlQuery += ` ORDER BY ${sort_by} ${order} `
     
     return db.query(sqlQuery, queryValues)
     .then((response) => {
