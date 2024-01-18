@@ -364,5 +364,3 @@ describe('/api/users', () => {
 });
 
 
-
-// REMEMBER TO ADD DESCRIPTION TO ENDPOINTS.JSON FILE
