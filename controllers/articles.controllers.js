@@ -12,8 +12,8 @@ exports.getArticleByArticleID = (req, res, next) => {
 }
 
 exports.getArticles = (req, res, next) => {
-    const { topic } = req.query;
-    const selectArticlesQuery = selectArticles(topic);
+    const { topic, sort_by, order } = req.query;
+    const selectArticlesQuery = selectArticles(topic, sort_by, order);
 
     const queries = [selectArticlesQuery];
     
