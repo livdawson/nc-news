@@ -1,5 +1,5 @@
 const { selectArticleByArticleID, selectArticles, updateArticleVotes } = require("../models/articles.models");
-const { checkArticleIDexists } = require("../utils/utils");
+const { checkArticleIDExists, checkTopicExists } = require("../utils/utils");
 
 exports.getArticleByArticleID = (req, res, next) => {
     const { article_id } = req.params;
@@ -12,8 +12,19 @@ exports.getArticleByArticleID = (req, res, next) => {
 }
 
 exports.getArticles = (req, res, next) => {
-    selectArticles()
-    .then((articles) => {
+    const { topic } = req.query;
+    const selectArticlesQuery = selectArticles(topic);
+
+    const queries = [selectArticlesQuery];
+    
+    if (topic) {
+        const topicExistenceQuery = checkTopicExists(topic);
+        queries.push(topicExistenceQuery)
+    }
+
+    Promise.all(queries)
+    .then((response) => {
+        const articles = response[0]
         res.status(200).send({ articles })
     }).catch((err) => {
         next(err)
@@ -24,7 +35,7 @@ exports.patchArticleVotes = (req, res, next) => {
     const { article_id } = req.params;
     const { inc_votes } = req.body;
     const updateVotesQuery = updateArticleVotes(article_id, inc_votes);
-    const articleIDExistenceQuery = checkArticleIDexists(article_id);
+    const articleIDExistenceQuery = checkArticleIDExists(article_id);
 
     Promise.all([updateVotesQuery, articleIDExistenceQuery, ])
     .then((response) => {
