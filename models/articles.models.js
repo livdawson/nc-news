@@ -34,8 +34,7 @@ exports.selectArticles = (topic, sort_by = "created_at", order = "desc") => {
     sqlQuery += ` ORDER BY ${sort_by} ${order} `
     
     return db.query(sqlQuery, queryValues)
-    .then((response) => {
-        const { rows } = response;
+    .then(({ rows }) => {
         return rows;
     })
 }
@@ -48,8 +47,10 @@ exports.updateArticleVotes = (article_id, inc_votes) => {
     RETURNING *
     `
     return db.query(sqlQuery, [inc_votes, article_id])
-    .then((response) => {
-        const { rows } = response;
+    .then(({ rows }) => {
+        if (rows.length === 0) {
+            return Promise.reject({status: 404, msg: "article_id not found"})
+        }
         return rows[0];
     })
 }

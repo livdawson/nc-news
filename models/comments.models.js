@@ -25,7 +25,8 @@ exports.insertNewComment = (article_id, username, body) => {
             RETURNING *
             `, [article_id, rows[0].username, body])
         }
-}).then(({ rows }) => {
+    })
+    .then(({ rows }) => {
         return rows[0];
     })
 };
@@ -37,6 +38,9 @@ exports.removeComment = (comment_id) => {
     RETURNING *
     `, [comment_id])
     .then(({ rows }) => {
+        if (rows.length === 0) {
+            return Promise.reject({status: 404, msg: "comment_id not found"})
+        }
         return rows;
     })
 }

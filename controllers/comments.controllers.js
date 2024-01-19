@@ -12,8 +12,8 @@ exports.getCommentsByArticleID = (req, res, next) => {
   const articleIDExistenceQuery = checkArticleIDExists(article_id);
 
   Promise.all([selectCommentsByArticleIDQuery, articleIDExistenceQuery])
-    .then((response) => {
-      const comments = response[0];
+    .then((queryResults) => {
+      const comments = queryResults[0];
       res.status(200).send({ comments });
     })
     .catch((err) => {
@@ -28,25 +28,22 @@ exports.postNewComment = (req, res, next) => {
   const articleIDExistenceQuery = checkArticleIDExists(article_id);
 
   Promise.all([insertCommentQuery, articleIDExistenceQuery])
-    .then((response) => {
-        const newComment = response[0];
+  .then((queryResults) => {
+        const newComment = queryResults[0];
         res.status(201).send({ comment: newComment });
-    })
-    .catch((err) => {
+  })
+  .catch((err) => {
       next(err);
-    });
+  });
 };
 
 exports.deleteComment = (req, res, next) => {
     const { comment_id } = req.params;
     removeComment(comment_id)
-    .then((deletedComment) => {
-        if (deletedComment.length === 0) {
-            return Promise.reject({ status: 404, msg: 'comment_id not found'})
-        } else {
-            res.status(204).send()
-        }
-    }).catch((err) => {
+    .then(() => {
+      res.sendStatus(204)
+    })
+    .catch((err) => {
         next(err)
     })
 }

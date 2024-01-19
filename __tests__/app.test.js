@@ -446,24 +446,6 @@ describe("/api/comments/:comment_id", () => {
     });
 });
 
-// be available on /api/comments/:comment_id.
-// update the votes on a comment given the comment's comment_id.
-// Request body accepts:
-
-// an object in the form { inc_votes: newVote }:
-// newVote will indicate how much the votes property in the database should be updated by, e.g.
-
-// { inc_votes : 1 } would increment the current comment's vote property by 1
-
-// { inc_votes : -1 } would decrement the current comment's vote property by 1
-
-// Responds with:
-
-// the updated comment.
-// Consider what errors could occur with this endpoint, and make sure to test for them.
-
-// Remember to add a description of this endpoint to your /api endpoint.
-
 describe('/api/users', () => {
     test('GET: 200, should provide client with an array of all user objects', () => {
         return request(app)
@@ -513,6 +495,17 @@ describe('/api/users/:username', () => {
   })
 });
 });
+
+describe.skip('/not-a-route', () => {
+  test('GET: 404, should respond with appropriate message when requesting an unavailable route', () => {
+    return request(app)
+    .get('/')
+    .expect(404)
+    .then(({ body }) => {
+      expect(body.msg).toBe('Not Found')
+    })
+  });
+})
 
 
 
