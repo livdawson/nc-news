@@ -7,23 +7,6 @@ const testData = require("../db/data/test-data");
 afterAll(() => db.end());
 beforeEach(() => seed(testData));
 
-describe("/api/topics", () => {
-  test("GET: 200, should provide client with an array of all topic objects", () => {
-    return request(app)
-      .get("/api/topics")
-      .expect(200)
-      .then(({ body }) => {
-        const { topics } = body;
-        expect(topics).toBeInstanceOf(Array);
-        expect(topics).toHaveLength(3);
-        topics.forEach((topic) => {
-          expect(typeof topic.slug).toBe("string");
-          expect(typeof topic.description).toBe("string");
-        });
-      });
-  });
-});
-
 describe("/api", () => {
   test("GET: 200, should provide client with an object describing all the available endpoints on the API", () => {
     return request(app)
@@ -47,116 +30,21 @@ describe("/api", () => {
   });
 });
 
-describe("/api/articles/:article_id", () => {
-  test("GET: 200, should give client the specific article object requested using its article_id", () => {
+describe("/api/topics", () => {
+  test("GET: 200, should provide client with an array of all topic objects", () => {
     return request(app)
-      .get("/api/articles/1")
+      .get("/api/topics")
       .expect(200)
       .then(({ body }) => {
-        const { article } = body;
-        expect(article).toMatchObject({
-          article_id: 1,
-          title: "Living in the shadow of a great man",
-          topic: "mitch",
-          author: "butter_bridge",
-          body: "I find this existence challenging",
-          created_at: "2020-07-09T20:11:00.000Z",
-          votes: 100,
-          article_img_url:
-            "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
+        const { topics } = body;
+        expect(topics).toBeInstanceOf(Array);
+        expect(topics).toHaveLength(3);
+        topics.forEach((topic) => {
+          expect(typeof topic.slug).toBe("string");
+          expect(typeof topic.description).toBe("string");
         });
       });
   });
-  test("GET: 404, should respond with appropriate message when given a valid but non existent article_id", () => {
-    return request(app)
-      .get("/api/articles/100")
-      .expect(404)
-      .then(({ body }) => {
-        expect(body.msg).toBe("Not Found");
-      });
-  });
-  test("GET: 400, should respond with appropriate message when given an invalid article_id", () => {
-    return request(app)
-      .get("/api/articles/one")
-      .expect(400)
-      .then(({ body }) => {
-        expect(body.msg).toBe("Bad Request");
-      });
-  });
-  test('PATCH: 200, should increment the votes property for the given article_id when a positive integer is in the client request, and provide client with the newly updated article', () => {
-    return request(app)
-    .patch('/api/articles/1')
-    .send({ inc_votes: 20 })
-    .expect(200)
-    .then(({ body }) => {
-        const { article } = body;
-        expect(article).toEqual({
-            article_id: 1,
-            title: "Living in the shadow of a great man",
-            topic: "mitch",
-            author: "butter_bridge",
-            body: "I find this existence challenging",
-            created_at: "2020-07-09T20:11:00.000Z",
-            votes: 120,
-            article_img_url: "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
-        })
-    })
-  });
-  test('PATCH: 200, should decrement the votes property for the given article_id when a negative integer is in the client request, and provide client with the newly updated article', () => {
-    return request(app)
-    .patch('/api/articles/1')
-    .send({ inc_votes: -20 })
-    .expect(200)
-    .then(({ body }) => {
-        const { article } = body;
-        expect(article).toEqual({
-            article_id: 1,
-            title: "Living in the shadow of a great man",
-            topic: "mitch",
-            author: "butter_bridge",
-            body: "I find this existence challenging",
-            created_at: "2020-07-09T20:11:00.000Z",
-            votes: 80,
-            article_img_url: "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
-        })
-    })
-  });
-  test('PATCH: 404, should respond with appropriate message when requesting to update an article with a valid but non-existent article_id', () => {
-    return request(app)
-    .patch('/api/articles/100')
-    .send({ inc_votes: 20 })
-    .expect(404)
-    .then(({ body }) => {
-        expect(body.msg).toBe('article_id not found')
-    })
-  });
-  test('PATCH: 400, should respond with appropriate message when requesting to update an article with an invalid article_id', () => {
-    return request(app)
-    .patch('/api/articles/one')
-    .send({ inc_votes: 20 })
-    .expect(400)
-    .then(({ body }) => {
-        expect(body.msg).toBe('Bad Request')
-    })
-  });
-  test('PATCH: 400, should respond with appropriate message when requesting to update an article with an invalid votes property', () => {
-    return request(app)
-    .patch('/api/articles/1')
-    .send({ inc_votes: 'twenty' })
-    .expect(400)
-    .then(({ body }) => {
-        expect(body.msg).toBe('Bad Request')
-    })
-    });
-    test('GET: 200, should provide client with a comment_count property that represents the total count of all the comments with the given article_id', () => {
-        return request(app)
-        .get('/api/articles/1')
-        .expect(200)
-        .then(({ body }) => {
-            const { article } = body;
-            expect(article.comment_count).toBe(11)
-        })
-    });
 });
 
 describe("/api/articles", () => {
@@ -255,6 +143,119 @@ describe("/api/articles", () => {
     })
   });
 });
+
+describe("/api/articles/:article_id", () => {
+  test("GET: 200, should give client the specific article object requested using its article_id", () => {
+    return request(app)
+      .get("/api/articles/1")
+      .expect(200)
+      .then(({ body }) => {
+        const { article } = body;
+        expect(article).toMatchObject({
+          article_id: 1,
+          title: "Living in the shadow of a great man",
+          topic: "mitch",
+          author: "butter_bridge",
+          body: "I find this existence challenging",
+          created_at: "2020-07-09T20:11:00.000Z",
+          votes: 100,
+          article_img_url:
+            "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
+        });
+      });
+  });
+  test("GET: 404, should respond with appropriate message when given a valid but non existent article_id", () => {
+    return request(app)
+      .get("/api/articles/100")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("article_id not found");
+      });
+  });
+  test("GET: 400, should respond with appropriate message when given an invalid article_id that does not meet the required format", () => {
+    return request(app)
+      .get("/api/articles/one")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad Request");
+      });
+  });
+  test('PATCH: 200, should increment the votes property for the given article_id when a positive integer is in the client request, and provide client with the newly updated article', () => {
+    return request(app)
+    .patch('/api/articles/1')
+    .send({ inc_votes: 20 })
+    .expect(200)
+    .then(({ body }) => {
+        const { article } = body;
+        expect(article).toEqual({
+            article_id: 1,
+            title: "Living in the shadow of a great man",
+            topic: "mitch",
+            author: "butter_bridge",
+            body: "I find this existence challenging",
+            created_at: "2020-07-09T20:11:00.000Z",
+            votes: 120,
+            article_img_url: "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
+        })
+    })
+  });
+  test('PATCH: 200, should decrement the votes property for the given article_id when a negative integer is in the client request, and provide client with the newly updated article', () => {
+    return request(app)
+    .patch('/api/articles/1')
+    .send({ inc_votes: -20 })
+    .expect(200)
+    .then(({ body }) => {
+        const { article } = body;
+        expect(article).toEqual({
+            article_id: 1,
+            title: "Living in the shadow of a great man",
+            topic: "mitch",
+            author: "butter_bridge",
+            body: "I find this existence challenging",
+            created_at: "2020-07-09T20:11:00.000Z",
+            votes: 80,
+            article_img_url: "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+        })
+    })
+  });
+  test('PATCH: 404, should respond with appropriate message when requesting to update an article with a valid but non-existent article_id', () => {
+    return request(app)
+    .patch('/api/articles/100')
+    .send({ inc_votes: 20 })
+    .expect(404)
+    .then(({ body }) => {
+        expect(body.msg).toBe('article_id not found')
+    })
+  });
+  test('PATCH: 400, should respond with appropriate message when requesting to update an article with an invalid article_id', () => {
+    return request(app)
+    .patch('/api/articles/one')
+    .send({ inc_votes: 20 })
+    .expect(400)
+    .then(({ body }) => {
+        expect(body.msg).toBe('Bad Request')
+    })
+  });
+  test('PATCH: 400, should respond with appropriate message when requesting to update an article with an invalid votes property', () => {
+    return request(app)
+    .patch('/api/articles/1')
+    .send({ inc_votes: 'twenty' })
+    .expect(400)
+    .then(({ body }) => {
+        expect(body.msg).toBe('Bad Request')
+    })
+    });
+    test('GET: 200, should provide client with a comment_count property that represents the total count of all the comments with the given article_id', () => {
+        return request(app)
+        .get('/api/articles/1')
+        .expect(200)
+        .then(({ body }) => {
+            const { article } = body;
+            expect(article.comment_count).toBe(11)
+        })
+    });
+});
+
 
 describe("/api/articles/:article_id/comments", () => {
   test("GET: 200, should provide client with an array of comments for the given article_id, sorted by default by date in descending order (most recent comments first)", () => {
@@ -405,4 +406,39 @@ describe('/api/users', () => {
         })
     });
 });
+
+describe('/api/users/:username', () => {
+  test('GET: 200, should give client the user object requested by its username', () => {
+    return request(app)
+    .get('/api/users/lurker')
+    .expect(200)
+    .then(({ body }) => {
+    const { user } = body;
+    expect(user).toMatchObject({
+      username: "lurker",
+      name: "do_nothing",
+      avatar_url: "https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png"
+    })
+    })
+  });
+  test('GET: 404, should respond with appropriate message when given a valid but non-existent username', () => {
+    return request(app)
+    .get('/api/users/c0d3r')
+    .expect(404)
+    .then(({ body }) => {
+      expect(body.msg).toBe("username not found")
+    })
+  });
+  test('GET: 400, should respond with appropriate message when given an invalid username (i.e. contains characters that could cause confusion with SQL queries)', () => {
+  return request(app)
+  .get('/api/users/invalid%3Fusername')
+  .expect(400)
+  .then(({ body }) => {
+    expect(body.msg).toBe("Bad Request")
+  })
+});
+});
+
+
+
 
