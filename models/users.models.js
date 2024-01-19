@@ -9,6 +9,9 @@ exports.selectUsers = () => {
 
 
 exports.selectUserByUsername = (username) => {
+    if (username.includes("?") || username.includes("&") || username.includes("%")) {
+        return Promise.reject({status: 400, msg: "Bad Request"})
+    }
     return db.query(
         `SELECT * FROM users
         WHERE username = $1

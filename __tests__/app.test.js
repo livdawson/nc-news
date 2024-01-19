@@ -429,6 +429,14 @@ describe('/api/users/:username', () => {
       expect(body.msg).toBe("username not found")
     })
   });
+  test('GET: 400, should respond with appropriate message when given an invalid username (i.e. contains characters that could cause confusion with SQL queries)', () => {
+  return request(app)
+  .get('/api/users/invalid%3Fusername')
+  .expect(400)
+  .then(({ body }) => {
+    expect(body.msg).toBe("Bad Request")
+  })
+});
 });
 
 
