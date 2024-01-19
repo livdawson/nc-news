@@ -2,6 +2,7 @@ const {
   selectCommentsByArticleID,
   insertNewComment,
   removeComment,
+  updateCommentVotes,
 } = require("../models/comments.models");
 const { checkArticleIDExists } = require("../utils/utils");
 
@@ -48,5 +49,17 @@ exports.deleteComment = (req, res, next) => {
     }).catch((err) => {
         next(err)
     })
+}
+
+exports.patchCommentVotes = (req, res, next) => {
+  const { comment_id } = req.params;
+  const { inc_votes } = req.body;
+  updateCommentVotes(comment_id, inc_votes)
+  .then((updatedComment) => {
+    res.status(200).send({comment: updatedComment})
+  })
+  .catch((err) => {
+    next(err)
+  })
 }
 
