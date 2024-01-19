@@ -387,7 +387,82 @@ describe("/api/comments/:comment_id", () => {
             expect(body.msg).toBe("Bad Request")
         })
     });
+    test('PATCH: 200, should increment the votes property for the given comment_id when a positive integer is in the client request, and provide client with newly updated comment', () => {
+      return request(app)
+      .patch('/api/comments/2')
+      .send({ inc_votes: 1})
+      .expect(200)
+      .then(({ body }) => {
+        const { comment } = body;
+        expect(comment).toMatchObject({
+          comment_id: 2,
+          article_id: 1,
+          author: "butter_bridge",
+          votes: 15,
+        })
+      })
+    });
+    test('PATCH: 200, should decrement the votes property for the given comment_id when a negative integer is in the client request, and provide client with newly updated comment', () => {
+      return request(app)
+      .patch('/api/comments/2')
+      .send({ inc_votes: -10})
+      .expect(200)
+      .then(({ body }) => {
+        const { comment } = body;
+        expect(comment).toMatchObject({
+          comment_id: 2,
+          article_id: 1,
+          author: "butter_bridge",
+          votes: 4,
+        })
+      })
+    });
+    test('PATCH: 400, should respond with appropriate message when requesting to update a comment with an invalid votes property', () => {
+      return request(app)
+      .patch('/api/comments/2')
+      .send({ inc_votes: 'ten'})
+      .expect(400)
+      .then(({ body }) => {
+         expect(body.msg).toBe("Bad Request")
+      })
+    });
+    test('PATCH: 404, should respond with appropriate message when requesting to update a comment with an valid but non existent comment_id', () => {
+      return request(app)
+      .patch('/api/comments/100')
+      .send({ inc_votes: 10})
+      .expect(404)
+      .then(({ body }) => {
+         expect(body.msg).toBe("comment_id not found")
+      })
+    });
+    test('PATCH: 400, should respond with appropriate message when requesting to update a comment with an invalid comment_id that does not meet the required format', () => {
+      return request(app)
+      .patch('/api/comments/two')
+      .send({ inc_votes: 10})
+      .expect(400)
+      .then(({ body }) => {
+         expect(body.msg).toBe("Bad Request")
+      })
+    });
 });
+
+// be available on /api/comments/:comment_id.
+// update the votes on a comment given the comment's comment_id.
+// Request body accepts:
+
+// an object in the form { inc_votes: newVote }:
+// newVote will indicate how much the votes property in the database should be updated by, e.g.
+
+// { inc_votes : 1 } would increment the current comment's vote property by 1
+
+// { inc_votes : -1 } would decrement the current comment's vote property by 1
+
+// Responds with:
+
+// the updated comment.
+// Consider what errors could occur with this endpoint, and make sure to test for them.
+
+// Remember to add a description of this endpoint to your /api endpoint.
 
 describe('/api/users', () => {
     test('GET: 200, should provide client with an array of all user objects', () => {
