@@ -1,12 +1,12 @@
 # Northcoders News API
  
-Check out the live version of the API [here](https://northcoders-news-board.onrender.com/)
+Check out the live version of the API [here](https://northcoders-news-board.onrender.com/).
 
 Explore the available endpoints through the '/api' endpoint or refer to the [endpoints.json](./endpoints.json) file.
 
 ## Overview
 
-The Northcoders News API is a backend service designed to provide programmable access to application data. Its primary purpose is to deliver information to the user interface of the web application, which is accessible [here](https://nc-news-board.netlify.app).
+The Northcoders News API is a backend service designed to provide programmable access to application data. Its primary purpose is to deliver information to the user interface of the web application, accessible [here](https://nc-news-board.netlify.app).
 
 ## Prerequisites 
 
